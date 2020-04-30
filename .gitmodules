@@ -1,0 +1,3 @@
+[submodule "zeromq-haskell"]
+	path = zeromq-haskell
+	url = git@gitlab.com:bgamari/zeromq-haskell.git
