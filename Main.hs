@@ -1,5 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-} 
-
+{-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
@@ -10,7 +9,7 @@ import qualified Data.Aeson as Aeson
 import Data.Aeson ((.=), (.:))
 -- import Data.Typeable
 import System.ZMQ4.Monadic as ZMQ
- 
+
  -- hint for evaluation
 import Language.Haskell.Interpreter as Hint
 
@@ -28,6 +27,7 @@ import Control.Monad.Trans.Class
 -- JSON encoding section
 data Request
   = Evaluate { reqInput :: Text }
+  deriving (Show)
 
 instance Aeson.FromJSON Request where
     parseJSON = Aeson.withObject "request" $ \o ->
@@ -49,16 +49,17 @@ main = runZMQ $ do
     liftIO $ do
         putStrLn "tcp://127.0.0.1:5558"
         hFlush stdout
-    
+
     res <- runInterpreter $ do
         Hint.setImports ["Prelude"]
         forever $ do
             req <- lift $ readRequest responder
+            liftIO $ print req
             result <- evaluateRequest req
             lift $ ZMQ.send responder [] $ BSL.toStrict $ Aeson.encode result
-        
+
         return ()
-            
+
     -- TODO: Handle failure
     liftIO $ print res
 
